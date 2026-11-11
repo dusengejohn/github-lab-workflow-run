@@ -1,0 +1,38 @@
+name: CD Deploy App
+
+on:
+  workflow_run:
+    # Must match the exact "name:" field of the upstream workflow
+    workflows: ["CI Build and Test"]
+    # Trigger types: completed, requested, or in_progress
+    types:
+      - completed
+    # Optional: Only trigger when the upstream workflow ran on main
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # Crucial: Prevent deployment if the upstream CI workflow failed or was cancelled
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: Inspect upstream workflow details
+        run: |
+          echo "Upstream Workflow Name: ${{ github.event.workflow_run.name }}"
+          echo "Upstream Run ID: ${{ github.event.workflow_run.id }}"
+          echo "Upstream Conclusion: ${{ github.event.workflow_run.conclusion }}"
+          echo "Commit SHA that triggered CI: ${{ github.event.workflow_run.head_sha }}"
+
+      - name: Download artifact from the upstream workflow
+        uses: actions/download-artifact@v4
+        with:
+          name: compiled-app
+          # Tell download-artifact which run ID produced the file
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Deploy downloaded artifact
+        run: |
+          echo "Deploying artifact contents:"
+          cat app.txt

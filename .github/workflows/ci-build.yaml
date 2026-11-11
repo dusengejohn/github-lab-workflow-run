@@ -1,0 +1,23 @@
+name: CI Build and Test
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build application
+        run: |
+          mkdir -p dist
+          echo "Build version ${{ github.sha }}" > dist/app.txt
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: compiled-app
+          path: dist/app.txt
