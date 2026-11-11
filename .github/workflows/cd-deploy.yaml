@@ -36,3 +36,5 @@ jobs:
         run: |
           echo "Deploying artifact contents:"
           cat app.txt
+      - name: Print repository in Bash
+        run: echo "Repo is $GITHUB_REPOSITORY"

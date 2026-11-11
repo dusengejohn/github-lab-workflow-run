@@ -21,3 +21,5 @@ jobs:
         with:
           name: compiled-app
           path: dist/app.txt
+      - name: Print repository in Bash
+        run: echo "Repo is $GITHUB_REPOSITORY"
